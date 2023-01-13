@@ -14,18 +14,28 @@ public class CustomerController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ILogger<CustomerController> _logger;
 
-    public CustomerController(IMediator mediator, IMapper mapper)
+    public CustomerController(IMediator mediator, IMapper mapper, ILogger<CustomerController> logger)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<IList<Customer>>> GetAllCustomers()
     {
-        var result = await _mediator.Send(new GetAllCustomersQuery());
-        return result.Count > 0 ? Ok(result) : NoContent();
+        try
+        {
+            var result = await _mediator.Send(new GetAllCustomersQuery());
+            return result.Count > 0 ? Ok(result) : NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(message: "Error in Customer controller: GetAllCustomers");
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
@@ -39,6 +49,7 @@ public class CustomerController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(message: "Error in CustomerChore controller: GetCustomerById");
             return BadRequest(ex.Message);
         }
     }

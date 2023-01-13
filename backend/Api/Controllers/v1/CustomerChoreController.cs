@@ -15,18 +15,27 @@ public class CustomerChoreController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ILogger<CustomerChoreController> _logger;
 
-    public CustomerChoreController(IMediator mediator, IMapper mapper)
+    public CustomerChoreController(IMediator mediator, IMapper mapper, ILogger<CustomerChoreController> logger)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<IList<CustomerChore>>> GetAllChores()
     {
-        var result = await _mediator.Send(new GetAllCustomerChoresQuery());
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new GetAllCustomerChoresQuery());
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
@@ -40,13 +49,21 @@ public class CustomerChoreController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(message: "Error in CustomerChore controller: GetCustomerChoresByCustomer");
             return BadRequest(ex.Message);
         }
     }
     [HttpPost]
     public async Task<ActionResult<CustomerChore>> PostCustomerChoreAsync(PostCustomerChoreRequestDto request)
     {
-        var result = await _mediator.Send(_mapper.Map<PostCustomerChoreRequestDto, AddCustomerChoreCommand>(request));
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PostCustomerChoreRequestDto, AddCustomerChoreCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

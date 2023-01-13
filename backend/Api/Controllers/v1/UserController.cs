@@ -15,18 +15,28 @@ public class UserController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(IMediator mediator, IMapper mapper)
+    public UserController(IMediator mediator, IMapper mapper, ILogger<UserController> logger)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<IList<User>>> GetAllUsers()
     {
-        var result = await _mediator.Send(new GetAllUsersQuery());
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new GetAllUsersQuery());
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+             _logger.LogError(message: "Error in User controller: GetAllUsers");
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
@@ -40,15 +50,23 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
+             _logger.LogError(message: "Error in User controller: GetUserById");
             return BadRequest(ex.Message);
         }
     }
 
     [HttpPost]
-    public async Task<ActionResult<User>> PostUserCommentAsync(PostUserRequestDto request)
+    public async Task<ActionResult<User>> PostUserAsync(PostUserRequestDto request)
     {
-        var result = await _mediator.Send(_mapper.Map<PostUserRequestDto, AddUserCommand>(request));
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PostUserRequestDto, AddUserCommand>(request));
+            return Ok(result); 
+        }
+        catch (Exception ex)
+        { 
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPatch]

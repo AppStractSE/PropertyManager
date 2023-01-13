@@ -15,18 +15,28 @@ public class ChoreCommentController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ILogger<ChoreCommentController> _logger;
 
-    public ChoreCommentController(IMediator mediator, IMapper mapper)
+    public ChoreCommentController(IMediator mediator, IMapper mapper, ILogger<ChoreCommentController> logger )
     {
         _mediator = mediator;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<IList<ChoreComment>>> GetAllChoreComments()
     {
-        var result = await _mediator.Send(new GetAllChoreCommentsQuery());
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new GetAllChoreCommentsQuery());
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(message: "Error in ChoreComment controller: GetAllChoreComments");
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
@@ -47,7 +57,14 @@ public class ChoreCommentController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ChoreComment>> PostChoreCommentAsync(PostChoreCommentRequestDto request)
     {
-        var result = await _mediator.Send(_mapper.Map<PostChoreCommentRequestDto, AddChoreCommentCommand>(request));
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PostChoreCommentRequestDto, AddChoreCommentCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        } 
     }
 }

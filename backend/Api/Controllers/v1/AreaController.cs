@@ -15,18 +15,29 @@ public class AreaController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private ILogger<AreaController> _logger;
 
-    public AreaController(IMediator mediator, IMapper mapper)
+    public AreaController(IMediator mediator, IMapper mapper, ILogger<AreaController> logger)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _logger = logger;
+       
     }
 
     [HttpGet]
     public async Task<ActionResult<IList<Area>>> GetAllAreas()
     {
-        var result = await _mediator.Send(new GetAllAreasQuery());
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new GetAllAreasQuery());
+            return Ok(result); 
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(message:"Error in Area controller: GetAllAreas");
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
@@ -40,15 +51,24 @@ public class AreaController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError("Error in Area controller: GetAreaById");
             return BadRequest(ex.Message);
+            
         }
     }
 
     [HttpPost]
     public async Task<ActionResult<Area>> PostAreaAsync(PostAreaRequestDto request)
     {
-        var result = await _mediator.Send(_mapper.Map<PostAreaRequestDto, AddAreaCommand>(request));
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PostAreaRequestDto, AddAreaCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
     [HttpPatch]

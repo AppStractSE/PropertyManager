@@ -14,23 +14,33 @@ public class ChoreStatusController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly ILogger<ChoreStatusController> _logger;
 
-    public ChoreStatusController(IMediator mediator, IMapper mapper)
+    public ChoreStatusController(IMediator mediator, IMapper mapper, ILogger<ChoreStatusController> logger)
     {
         _mediator = mediator;
         _mapper = mapper;
-    }
+        _logger = logger;
+    }   
 
     [HttpGet]
     public async Task<ActionResult<IList<ChoreStatus>>> GetAllChoreStatuses()
     {
-        var result = await _mediator.Send(new GetAllChoreStatusesQuery());
-        return Ok(result);
+        try
+        {
+            var result = await _mediator.Send(new GetAllChoreStatusesQuery());
+            return Ok(result);   
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(message: "Error in ChoreStatus controller: GetAllChoreStatuses");
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
     [Route("GetChoreStatusById/")]
-    public async Task<ActionResult<ChoreStatusResponseDto>> GetChoreById([FromQuery]GetChoreStatusByIdRequestDto request)
+    public async Task<ActionResult<ChoreStatusResponseDto>> GetChoreStatusById([FromQuery]GetChoreStatusByIdRequestDto request)
     {
         try
         {
@@ -39,6 +49,7 @@ public class ChoreStatusController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(message: "Error in ChoreStatus controller: GetChoreStatusById");
             return BadRequest(ex.Message);
         }
     }
