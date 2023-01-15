@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Domain.Domain;
 using Api.Dto.Response.ChoreStatus.v1;
 using Api.Dto.Request.ChoreStatus.v1;
+using Domain.Features.Commands.ChoreStatus;
 
 namespace Api.Controllers.v1;
 
@@ -40,16 +41,30 @@ public class ChoreStatusController : ControllerBase
 
     [HttpGet]
     [Route("GetChoreStatusById/")]
-    public async Task<ActionResult<ChoreStatusResponseDto>> GetChoreStatusById([FromQuery]GetChoreStatusByIdRequestDto request)
+    public async Task<ActionResult<IList<ChoreStatusResponseDto>>> GetChoreStatusById([FromQuery] GetChoreStatusByIdRequestDto request)
     {
         try
         {
             var result = await _mediator.Send(_mapper.Map<GetChoreStatusByIdRequestDto, GetChoreStatusByIdQuery>(request));
-            return result != null ? Ok(_mapper.Map<ChoreStatusResponseDto>(result)) : NoContent();
+            return result.Count > 0 ? Ok(_mapper.Map<IList<ChoreStatusResponseDto>>(result)) : new List<ChoreStatusResponseDto>();
         }
         catch (Exception ex)
         {
             _logger.LogError(message: "Error in ChoreStatus controller: GetChoreStatusById");
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<ChoreStatus>> PostChoreStatusAsync(PostChoreStatusRequestDto request)
+    {
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PostChoreStatusRequestDto, AddChoreStatusCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }

@@ -3,17 +3,18 @@ import { Form, Modal, Spinner } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { BsCameraFill, BsFillArrowUpCircleFill } from "react-icons/bs";
 import { useMutation, useQuery } from "react-query";
-import useAxios from "../../hooks/useAxios";
-import axiosClient from "../../utils/axiosClient";
-import CustomToast from "../snacks/CustomToast";
-import ImageModal from "./ImageModal";
+import useAxios from "../../../hooks/useAxios";
+import axiosClient from "../../../utils/axiosClient";
+import CustomToast from "../../snacks/CustomToast";
+import ImageModal from "../ImageModal";
+import { ChoreComments } from "./ChoreComments";
+import { ChoreStatus } from "./ChoreStatus";
 
-const ChoreInfo = (props: any) => {
+const ChoreInfoCard = (props: any) => {
   const [choreImage, setChoreImage] = useState("");
   const [imgModal, setImgModalShow] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [commentValue, setCommentValue] = useState("");
-  const date = new Date();
 
   const handlePhotoCapture = (target: any) => {
     if (target.files) {
@@ -30,14 +31,24 @@ const ChoreInfo = (props: any) => {
     method: "get",
   });
 
+  const fetchChoreStatuses = useAxios({
+    url: `/ChoreStatus/GetChoreStatusById?Id=${props.customerchore.id}`,
+    method: "get",
+  });
+
   const {
     data,
     error,
     isLoading,
     refetch: refetchChoreComments,
-  } = useQuery<any>(props.customerchore.id, fetchChoreComments);
+  } = useQuery<any>("comment_" + props.customerchore.id, fetchChoreComments);
 
-  refetchChoreComments();
+  const {
+    data: choreStatuses,
+    error: choreStatusError,
+    isLoading: choreStatusIsLoading,
+    refetch: refetchChoreStatuses,
+  } = useQuery<any>("status_" + props.customerchore.id, fetchChoreStatuses);
 
   const { mutate: postComment, isLoading: postingComment } = useMutation(
     async () => {
@@ -54,7 +65,26 @@ const ChoreInfo = (props: any) => {
       },
     },
   );
-  if (isLoading) {
+
+  const { mutate: postChoreStatus, isLoading: postingChoreStatus } = useMutation(
+    async () => {
+      return await axiosClient.post("/ChoreStatus", {
+        customerChoreId: props.customerchore.id,
+        doneBy: "userId",
+      });
+    },
+    {
+      onSuccess: () => {
+        refetchChoreStatuses();
+        setTimeout(() => {
+          props.onHide();
+        }, 1000);
+        setShowToast(true);
+      },
+    },
+  );
+
+  if (isLoading || choreStatusIsLoading) {
     return <Spinner />;
   }
 
@@ -71,7 +101,7 @@ const ChoreInfo = (props: any) => {
         <Modal.Body>
           <div className='modal-body-section'>
             <Modal.Title className='p small'>Status</Modal.Title>
-            <div className='p'>Ej påbörjad</div>
+            <ChoreStatus chorestatuses={choreStatuses} customerchore={props.customerchore} />
           </div>
           <div className='modal-body-section'>
             <Modal.Title className='p small'>Återkommer</Modal.Title>
@@ -86,18 +116,7 @@ const ChoreInfo = (props: any) => {
           </div>
           <div className='modal-body-section'>
             <Modal.Title className='p small'>Kommentarer</Modal.Title>
-            <div className='chore-comments'>
-              {data.map((data: any) => (
-                <div key={data.id} className='chore-comment-container'>
-                  <div className='d-flex align-items-center gap-1'>
-                    <div className='p fw-bold'>Niklas P</div>{" "}
-                    {/* Insert user here instead of hard coded */}
-                    <div className='p small text-muted'>{data.time.replace("T", " - ")}</div>
-                  </div>
-                  <div className='p'>{data.message}</div>
-                </div>
-              ))}
-            </div>
+            <ChoreComments data={data} />
           </div>
           <div className='modal-body-section'>
             <div className='d-flex align-items-center camera-container'>
@@ -131,15 +150,13 @@ const ChoreInfo = (props: any) => {
                     onClick={() => postComment()}
                     disabled={commentValue ? false : true}
                     variant='success'
-                    style={{
-                      padding: 0,
-                      background: "transparent",
-                      color: "#198754",
-                      border: "none",
-                      marginRight: "4px",
-                    }}
+                    className='upload-button'
                   >
-                    {postingComment ? <div>U</div> : <BsFillArrowUpCircleFill size={36} />}
+                    {postingComment ? (
+                      <Spinner as='span' animation='border' role='status' aria-hidden='true' />
+                    ) : (
+                      <BsFillArrowUpCircleFill size={36} />
+                    )}
                   </Button>
                 </Form.Group>
               </Form>
@@ -154,14 +171,26 @@ const ChoreInfo = (props: any) => {
         </Modal.Body>
         <Modal.Footer>
           <Button
+            disabled={props.customerchore.frequency === choreStatuses.length ? true : false}
             type='submit'
             onClick={() => {
               setCommentValue("");
-              props.onHide();
-              setShowToast(true);
+              postChoreStatus();
             }}
           >
-            Markera som klar
+            {postingChoreStatus ? (
+              <Spinner
+                as='span'
+                animation='border'
+                size='sm'
+                role='status'
+                aria-hidden='true'
+                className='mx-2'
+              />
+            ) : null}
+            {props.customerchore.frequency === choreStatuses.length
+              ? "Uppgift är klar!"
+              : "Markera som klar"}
           </Button>
         </Modal.Footer>
         <ImageModal show={imgModal} onHide={() => setImgModalShow(false)} image={choreImage} />
@@ -171,4 +200,4 @@ const ChoreInfo = (props: any) => {
   );
 };
 
-export default ChoreInfo;
+export default ChoreInfoCard;
