@@ -66,4 +66,18 @@ public class CustomerChoreController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPut]
+    public async Task<ActionResult<CustomerChore>> PutCustomerChoreAsync(PutCustomerChoreRequestDto request)
+    {
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PutCustomerChoreRequestDto, UpdateCustomerChoreCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
