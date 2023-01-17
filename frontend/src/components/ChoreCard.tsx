@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button, Card, Container, Spinner } from "react-bootstrap";
+import { Button, Card, Container } from "react-bootstrap";
 import { useQuery } from "react-query";
 import useAxios from "../hooks/useAxios";
 import { CustomerChore } from "../models/CustomerChore";
-import ChoreInfoCard from "./modals/Chore/ChoreInfoCard";
+import ChoreInfoCard from "./modals/CustomerChore";
 
 interface Props {
   customerchore: CustomerChore;
@@ -22,10 +22,6 @@ const ChoreCard = ({ customerchore }: Props) => {
     refetch: refetchChoreStatuses,
   } = useQuery<any>("status_" + customerchore.id, fetchChoreStatuses);
 
-  if (choreStatusIsLoading) {
-    return <Spinner />;
-  }
-
   return (
     <>
       <Card onClick={() => setModalShow(true)}>
@@ -40,6 +36,9 @@ const ChoreCard = ({ customerchore }: Props) => {
             <Card.Title className='small text-muted'>Status</Card.Title>
 
             {(() => {
+              if (choreStatusIsLoading) {
+                return <></>;
+              }
               if (choreStatuses.length === customerchore.frequency) {
                 return <Card.Text className='small p-2 status completed'>Klar</Card.Text>;
               } else if (choreStatuses.length > 0) {
