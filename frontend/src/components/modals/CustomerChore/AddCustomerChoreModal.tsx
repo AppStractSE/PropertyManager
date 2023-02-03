@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useMutation, useQueryClient } from "react-query";
-import axiosClient from "../../../utils/axiosClient";
+import { Client } from "../../../api/client";
 
 const AddCustomerChoreModal = (props: any) => {
   const [choreValue, setChoreValue] = useState("");
   const [customerValue, setCustomerValue] = useState("");
   const [periodicValue, setPeriodicValue] = useState("");
-  const [frequencyValue, setFrequencyValue] = useState("");
+  const [frequencyValue, setFrequencyValue] = useState(1);
   const queryClient = useQueryClient();
+  const client = new Client();
   const { mutate: postCustomerChore, isLoading: postingCustomerChore } = useMutation(
     async () => {
-      return await axiosClient.post("/CustomerChore", {
+      return await client.customerChore_PostCustomerChore({
         customerId: customerValue,
         choreId: choreValue,
         frequency: frequencyValue,
@@ -20,7 +21,7 @@ const AddCustomerChoreModal = (props: any) => {
     },
     {
       onSuccess: () => {
-        setFrequencyValue("");
+        setFrequencyValue(0);
         queryClient.invalidateQueries("customers");
         queryClient.invalidateQueries("periodics");
         queryClient.invalidateQueries("chores");
@@ -35,14 +36,21 @@ const AddCustomerChoreModal = (props: any) => {
         <Modal.Title id='contained-modal-title-vcenter'>Lägg till syssla</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form>
-          <Form.Group className='mb-3 d-flex flex-column gap-3' controlId='formAddArea'>
+        <Form className='mb-3 d-flex flex-column gap-3'>
+          <Form.Group>
             <Form.Label>Hur ofta ska sysslan utföras?</Form.Label>
             <Form.Control
               type='number'
-              value={frequencyValue}
-              onChange={(e) => setFrequencyValue(e.target.value)}
+              value={frequencyValue.toString().replace(/^0+/, "Skriv in ett tal")}
+              min={1}
+              max={100}
+              onKeyUp={() => {
+                if (frequencyValue > 100) setFrequencyValue(100);
+              }}
+              onChange={(e) => setFrequencyValue(Number(e.target.value))}
             />
+          </Form.Group>
+          <Form.Group>
             <Form.Select
               aria-label='Chore'
               value={choreValue}
@@ -59,6 +67,8 @@ const AddCustomerChoreModal = (props: any) => {
                   );
                 })}
             </Form.Select>
+          </Form.Group>
+          <Form.Group>
             <Form.Select
               aria-label='Tidsintervall'
               value={periodicValue}
@@ -75,6 +85,8 @@ const AddCustomerChoreModal = (props: any) => {
                   );
                 })}
             </Form.Select>
+          </Form.Group>
+          <Form.Group>
             <Form.Select
               aria-label='Välj kund dropdown'
               value={customerValue}
@@ -102,7 +114,7 @@ const AddCustomerChoreModal = (props: any) => {
                 ? true
                 : false || customerValue.includes("Välj")
                 ? true
-                : false || frequencyValue == null
+                : false || frequencyValue == 0
             }
           >
             Lägg till syssla på kund
