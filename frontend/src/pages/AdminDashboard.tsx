@@ -25,27 +25,47 @@ const AdminDashboard = () => {
     data: areas,
     error: areasError,
     isLoading: areasLoading,
-  } = useQuery<AreaResponseDto[]>("areas", fetchAreas);
+  } = useQuery<AreaResponseDto[]>("areas", fetchAreas, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
   const {
     data: teams,
     error: teamsError,
     isLoading: teamsLoading,
-  } = useQuery<TeamResponseDto[]>("teams", fetchTeams);
+  } = useQuery<TeamResponseDto[]>("teams", fetchTeams, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
   const {
     data: customers,
     error: customersError,
     isLoading: customersLoading,
-  } = useQuery<CustomerResponseDto[]>("customers", fetchCustomers);
+  } = useQuery<CustomerResponseDto[]>("customers", fetchCustomers, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
   const {
     data: periodics,
     error: periodicsError,
     isLoading: periodicsLoading,
-  } = useQuery<Periodic>("periodics", fetchPeriodics);
+  } = useQuery<Periodic>("periodics", fetchPeriodics, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
   const {
     data: chores,
     error: choresError,
     isLoading: choresLoading,
-  } = useQuery<Periodic>("chores", fetchChores);
+  } = useQuery<Periodic>("chores", fetchChores, {
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
   return (
     <motion.div
