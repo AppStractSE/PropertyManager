@@ -1,28 +1,41 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Button, Container } from "react-bootstrap";
-import { useQuery } from "react-query";
+import { Col, Container, Nav, Row, Tab } from "react-bootstrap";
+import { AiOutlineHeart, AiOutlinePlus, AiOutlineTeam } from "react-icons/ai";
+import { IoBriefcaseOutline } from "react-icons/io5";
+import { RiTodoLine } from "react-icons/ri";
+import { useQuery, useQueryClient } from "react-query";
 import {
   AreaResponseDto,
+  CategoryResponseDto,
+  ChoreCommentResponseDto,
   ChoreResponseDto,
+  ChoreStatusResponseDto,
   Client,
+  CustomerChoreResponseDto,
   CustomerResponseDto,
   Periodic,
+  TeamMemberResponseDto,
   TeamResponseDto,
+  UserInfoDto,
 } from "../api/client";
-import CustomerTeamCard from "../components/CustomerTeamCard";
-import AddAreaModal from "../components/modals/AddAreaModal";
-import { default as AddCustomerModal } from "../components/modals/AddCustomerModal";
-import AddTeamModal from "../components/modals/AddTeamModal";
-import AddCustomerChoreModal from "../components/modals/CustomerChore/AddCustomerChoreModal";
-
+import AddCustomerChore from "../components/admindashboard/AddCustomerChore";
+import AddChore from "../components/admindashboard/chore/AddChore";
+import AddCustomer from "../components/admindashboard/customer/AddCustomer";
+import CustomerTable from "../components/admindashboard/customer/CustomerTable";
+import CustomerGraph from "../components/admindashboard/CustomerGraph";
+import Overview from "../components/admindashboard/Overview";
+import AddTeam from "../components/admindashboard/team/AddTeam";
+import TeamTable from "../components/admindashboard/team/TeamTable";
 const AdminDashboard = () => {
   const [addAreaModal, showAddAreaModal] = useState(false);
   const [addTeamModal, showAddTeamModal] = useState(false);
   const [addCustomerModal, showAddCustomerModal] = useState(false);
   const [addCustomerChoreModal, showAddCustomerChoreModal] = useState(false);
-  const client = new Client();
+  const [showModal, setShowModal] = useState(false);
 
+  const client = new Client();
+  const queryClient = useQueryClient();
   const {
     data: areas,
     error: areasError,
@@ -73,65 +86,159 @@ const AdminDashboard = () => {
     refetchOnMount: false,
   });
 
+  const { data: customerChores } = useQuery<CustomerChoreResponseDto[]>(
+    ["customerchores"],
+    async () => client.customerChore_GetAllChores(),
+  );
+
+  const { data: choreComments } = useQuery<ChoreCommentResponseDto[]>(["chorecomments"], async () =>
+    client.choreComment_GetAllChoreComments(),
+  );
+
+  const { data: latestChoreComments } = useQuery<ChoreCommentResponseDto[]>(
+    ["latestchorecomments"],
+    async () => client.choreComment_GetLatestFiveChoreComments(),
+  );
+
+  const { data: users } = useQuery<UserInfoDto[]>("users", async () =>
+    client.authenticate_GetAllUsers(),
+  );
+
+  const { data: teamMembers } = useQuery<TeamMemberResponseDto[]>("teamMembers", async () =>
+    client.teamMember_GetAllTeamMembers(),
+  );
+
+  const { data: choreStatuses, isLoading: loadingChoreStatuses } = useQuery<
+    ChoreStatusResponseDto[]
+  >("choreStatuses", async () => client.choreStatus_GetAllChoreStatuses());
+
+  const { data: categories, isLoading: loadingCategories } = useQuery<CategoryResponseDto[]>(
+    "categories",
+    async () => client.category_GetAllCategories(),
+  );
+
   return (
     <motion.div
+      className='d-flex'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
-      <Container className='mt-3 mb-3 d-flex gap-5'>
-        <div className='customerWithTeamsContainer'>
-          <div>Customers with teams</div>
-          {customers?.map((customer) => (
-            <CustomerTeamCard customer={customer} key={customer.id} />
-          ))}
-        </div>
-        <div className='customerContainer'>
-          <div>Customers</div>
-          {customers?.map((customer) => (
-            <div key={customer.id}>{customer.name}</div>
-          ))}
-          <Button onClick={() => showAddCustomerModal(true)}>Add customer</Button>
-          <AddCustomerModal
-            areas={areas}
-            teams={teams}
-            show={addCustomerModal}
-            onHide={() => showAddCustomerModal(false)}
-          />
-        </div>
-
-        <div className='teamContainer'>
-          <div>Teams</div>
-          {teams?.map((team) => (
-            <div key={team.id}>{team.name}</div>
-          ))}
-          <Button onClick={() => showAddTeamModal(true)}>Add team</Button>
-          <AddTeamModal show={addTeamModal} onHide={() => showAddTeamModal(false)} />
-        </div>
-        <div className='areaContainer'>
-          <div>Areas</div>
-          {areas?.map((area) => (
-            <div key={area.id}>{area.name}</div>
-          ))}
-          <Button onClick={() => showAddAreaModal(true)}>Add area</Button>
-          <AddAreaModal show={addAreaModal} onHide={() => showAddAreaModal(false)} />
-        </div>
-
-        <div className='customerContainer'>
-          <div>Customer chores</div>
-          {customers?.map((customer) => (
-            <div key={customer.id}>{customer.name}</div>
-          ))}
-          <Button onClick={() => showAddCustomerChoreModal(true)}>Add customer chore</Button>
-          <AddCustomerChoreModal
-            customers={customers}
-            periodics={periodics}
-            chores={chores}
-            show={addCustomerChoreModal}
-            onHide={() => showAddCustomerChoreModal(false)}
-          />
-        </div>
+      <Container className='p-3'>
+        <Tab.Container defaultActiveKey='zero'>
+          <Row>
+            <Col sm={12} md={12} lg={2}>
+              <Nav variant='pills' className='flex-column'>
+                <Nav.Item>
+                  <Nav.Link
+                    eventKey='zero'
+                    className='d-flex align-items-center gap-4'
+                    onClick={() => queryClient.invalidateQueries("latestchorecomments")}
+                  >
+                    <AiOutlineHeart size={24} />
+                    <div>Översikt</div>
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey='first' className='d-flex align-items-center gap-4'>
+                    <IoBriefcaseOutline size={24} />
+                    <div>Kunder</div>
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey='second' className='d-flex align-items-center gap-4'>
+                    <AiOutlineTeam size={24} />
+                    <div>Teams</div>
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey='third' className='d-flex align-items-center gap-4'>
+                    <RiTodoLine size={24} />
+                    <div>Sysslor</div>
+                  </Nav.Link>
+                </Nav.Item>
+                <hr className='navbar-divider px-4 my-4 opacity-70'></hr>
+                <Nav.Item>
+                  <Nav.Link eventKey='fourth' className='d-flex align-items-center gap-4'>
+                    <AiOutlinePlus size={24} />
+                    <div>Skapa</div>
+                  </Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Col>
+            <Col sm={12} md={12} lg={12 - 2}>
+              <Tab.Content>
+                <Tab.Pane eventKey='zero'>
+                  {latestChoreComments && <Overview chorecomments={latestChoreComments} />}
+                </Tab.Pane>
+                <Tab.Pane eventKey='first'>
+                  <div className='fs-4 mb-2'>Kundöversikt</div>
+                  <CustomerGraph />
+                  {teamMembers && customers && teams && customerChores && periodics && (
+                    <CustomerTable
+                      periodics={periodics}
+                      customerchores={customerChores}
+                      customers={customers}
+                      teams={teams}
+                      teammembers={teamMembers}
+                    />
+                  )}
+                </Tab.Pane>
+                <Tab.Pane eventKey='second'>
+                  <div className='fs-4 mb-2'>Team</div>
+                  {teams && teamMembers && users && (
+                    <TeamTable teams={teams} teammembers={teamMembers} users={users} />
+                  )}
+                </Tab.Pane>
+                <Tab.Pane eventKey='third'>
+                  <Container></Container>
+                </Tab.Pane>
+                <Tab.Pane eventKey='fourth'>
+                  <Container>
+                    <Tab.Container defaultActiveKey='first'>
+                      <Nav variant='pills' className='flex-row'>
+                        <Nav.Item>
+                          <Nav.Link eventKey='first'>Kund</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                          <Nav.Link eventKey='second'>Syssla</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                          <Nav.Link eventKey='third'>Team</Nav.Link>
+                        </Nav.Item>
+                      </Nav>
+                      <Col>
+                        <Tab.Content>
+                          <Tab.Pane eventKey='first'>
+                            <div className='fs-4 mb-3 mt-3'>Skapa kund</div>
+                            {teams && areas && <AddCustomer teams={teams} areas={areas} />}
+                          </Tab.Pane>
+                          <Tab.Pane eventKey='second'>
+                            <div className='fs-4 mb-3 mt-3'>Skapa syssla</div>
+                            <AddChore />
+                            <div className='fs-4 mb-3 mt-3'>Skapa kundsyssla</div>
+                            <AddCustomerChore
+                              customers={customers}
+                              periodics={periodics}
+                              chores={chores}
+                            />
+                          </Tab.Pane>
+                          <Tab.Pane eventKey='third'>
+                            <div className='fs-4 mb-3 mt-3'>Skapa team</div>
+                            {users && teams && teamMembers && (
+                              <AddTeam users={users} teams={teams} teammembers={teamMembers} />
+                            )}
+                          </Tab.Pane>
+                        </Tab.Content>
+                      </Col>
+                    </Tab.Container>
+                  </Container>
+                </Tab.Pane>
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
       </Container>
     </motion.div>
   );

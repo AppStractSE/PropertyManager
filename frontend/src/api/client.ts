@@ -400,6 +400,41 @@ export class Client extends BaseClient {
         return Promise.resolve<void>(null as any);
     }
 
+    category_GetAllCategories(): Promise<CategoryResponseDto[]> {
+        let url_ = this.baseUrl + "/api/v1/Category";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processCategory_GetAllCategories(_response);
+        });
+    }
+
+    protected processCategory_GetAllCategories(response: Response): Promise<CategoryResponseDto[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as CategoryResponseDto[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<CategoryResponseDto[]>(null as any);
+    }
+
     choreComment_GetAllChoreComments(): Promise<ChoreComment[]> {
         let url_ = this.baseUrl + "/api/v1/ChoreComment";
         url_ = url_.replace(/[?&]$/, "");
@@ -497,6 +532,41 @@ export class Client extends BaseClient {
     }
 
     protected processChoreComment_GetCustomerChoresByCustomer(response: Response): Promise<ChoreCommentResponseDto[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as ChoreCommentResponseDto[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<ChoreCommentResponseDto[]>(null as any);
+    }
+
+    choreComment_GetLatestFiveChoreComments(): Promise<ChoreCommentResponseDto[]> {
+        let url_ = this.baseUrl + "/api/v1/ChoreComment/GetLatestFiveChoreComments";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processChoreComment_GetLatestFiveChoreComments(_response);
+        });
+    }
+
+    protected processChoreComment_GetLatestFiveChoreComments(response: Response): Promise<ChoreCommentResponseDto[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -665,7 +735,7 @@ export class Client extends BaseClient {
         return Promise.resolve<ChoreResponseDto>(null as any);
     }
 
-    choreStatus_GetAllChoreStatuses(): Promise<ChoreStatus[]> {
+    choreStatus_GetAllChoreStatuses(): Promise<ChoreStatusResponseDto[]> {
         let url_ = this.baseUrl + "/api/v1/ChoreStatus";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -683,13 +753,13 @@ export class Client extends BaseClient {
         });
     }
 
-    protected processChoreStatus_GetAllChoreStatuses(response: Response): Promise<ChoreStatus[]> {
+    protected processChoreStatus_GetAllChoreStatuses(response: Response): Promise<ChoreStatusResponseDto[]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as ChoreStatus[];
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as ChoreStatusResponseDto[];
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -697,7 +767,7 @@ export class Client extends BaseClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<ChoreStatus[]>(null as any);
+        return Promise.resolve<ChoreStatusResponseDto[]>(null as any);
     }
 
     choreStatus_PostChoreStatus(request: PostChoreStatusRequestDto): Promise<ChoreStatus> {
@@ -988,6 +1058,45 @@ export class Client extends BaseClient {
     }
 
     protected processCustomer_PostCustomer(response: Response): Promise<Customer> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Customer;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Customer>(null as any);
+    }
+
+    customer_PutCustomer(request: PutCustomerRequestDto): Promise<Customer> {
+        let url_ = this.baseUrl + "/api/v1/Customer";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processCustomer_PutCustomer(_response);
+        });
+    }
+
+    protected processCustomer_PutCustomer(response: Response): Promise<Customer> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -1304,84 +1413,6 @@ export class Client extends BaseClient {
         return Promise.resolve<TeamMember[]>(null as any);
     }
 
-    teamMember_PostTeamMember(request: PostTeamMemberRequestDto): Promise<TeamMember> {
-        let url_ = this.baseUrl + "/api/v1/TeamMember";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        };
-
-        return this.transformOptions(options_).then(transformedOptions_ => {
-            return this.http.fetch(url_, transformedOptions_);
-        }).then((_response: Response) => {
-            return this.processTeamMember_PostTeamMember(_response);
-        });
-    }
-
-    protected processTeamMember_PostTeamMember(response: Response): Promise<TeamMember> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TeamMember;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<TeamMember>(null as any);
-    }
-
-    teamMember_PutTeamMember(request: PutTeamMemberRequestDto): Promise<TeamMember> {
-        let url_ = this.baseUrl + "/api/v1/TeamMember";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        };
-
-        return this.transformOptions(options_).then(transformedOptions_ => {
-            return this.http.fetch(url_, transformedOptions_);
-        }).then((_response: Response) => {
-            return this.processTeamMember_PutTeamMember(_response);
-        });
-    }
-
-    protected processTeamMember_PutTeamMember(response: Response): Promise<TeamMember> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TeamMember;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<TeamMember>(null as any);
-    }
-
     teamMember_GetTeamMemberById(id: string | undefined): Promise<TeamMemberResponseDto> {
         let url_ = this.baseUrl + "/api/v1/TeamMember/GetTeamMemberById?";
         if (id === null)
@@ -1458,6 +1489,162 @@ export class Client extends BaseClient {
             });
         }
         return Promise.resolve<TeamMemberResponseDto[]>(null as any);
+    }
+
+    teamMember_PostTeamMember(request: PostTeamMemberRequestDto): Promise<TeamMember> {
+        let url_ = this.baseUrl + "/api/v1/TeamMember/AddTeamMember";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processTeamMember_PostTeamMember(_response);
+        });
+    }
+
+    protected processTeamMember_PostTeamMember(response: Response): Promise<TeamMember> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TeamMember;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<TeamMember>(null as any);
+    }
+
+    teamMember_PostTeamMembers(request: PostTeamMembersRequestDto): Promise<TeamMember[]> {
+        let url_ = this.baseUrl + "/api/v1/TeamMember/AddTeamMembers";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processTeamMember_PostTeamMembers(_response);
+        });
+    }
+
+    protected processTeamMember_PostTeamMembers(response: Response): Promise<TeamMember[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TeamMember[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<TeamMember[]>(null as any);
+    }
+
+    teamMember_PutTeamMember(request: PutTeamMemberRequestDto): Promise<TeamMember> {
+        let url_ = this.baseUrl + "/api/v1/TeamMember/UpdateTeamMember";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processTeamMember_PutTeamMember(_response);
+        });
+    }
+
+    protected processTeamMember_PutTeamMember(response: Response): Promise<TeamMember> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TeamMember;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<TeamMember>(null as any);
+    }
+
+    teamMember_PutTeamMembers(request: PutTeamMembersRequestDto): Promise<TeamMember[]> {
+        let url_ = this.baseUrl + "/api/v1/TeamMember/UpdateTeamMembers";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processTeamMember_PutTeamMembers(_response);
+        });
+    }
+
+    protected processTeamMember_PutTeamMembers(response: Response): Promise<TeamMember[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TeamMember[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<TeamMember[]>(null as any);
     }
 
     userData_GetUserDataById(id: string | null | undefined): Promise<UserDataResponseDto> {
@@ -1560,6 +1747,20 @@ export interface RegisterModel {
     displayName: string;
 }
 
+export interface CategoryResponseDto {
+    id: string;
+    title: string | undefined;
+    description: string | undefined;
+    subCategories: SubCategoryResponseDto[] | undefined;
+}
+
+export interface SubCategoryResponseDto {
+    id: string;
+    categoryId: string;
+    title: string | undefined;
+    reference: string | undefined;
+}
+
 export interface ChoreComment {
     id: string;
     message: string | undefined;
@@ -1590,7 +1791,7 @@ export interface ChoreResponseDto {
 
 export interface Chore {
     id: string;
-    categoryId: string | undefined;
+    subCategoryId: string | undefined;
     description: string | undefined;
     title: string | undefined;
 }
@@ -1608,17 +1809,17 @@ export interface PutChoreRequestDto {
     title: string | undefined;
 }
 
-export interface ChoreStatus {
+export interface ChoreStatusResponseDto {
     id: string;
-    customerChoreId: string | undefined;
+    customerChoreId: string;
     startDate: Date;
     completedDate: Date;
     doneBy: string | undefined;
 }
 
-export interface ChoreStatusResponseDto {
+export interface ChoreStatus {
     id: string;
-    customerChoreId: string;
+    customerChoreId: string | undefined;
     startDate: Date;
     completedDate: Date;
     doneBy: string | undefined;
@@ -1691,6 +1892,14 @@ export interface PostCustomerRequestDto {
     address: string | undefined;
 }
 
+export interface PutCustomerRequestDto {
+    id: string;
+    name: string | undefined;
+    areaId: string | undefined;
+    teamId: string | undefined;
+    address: string | undefined;
+}
+
 export interface Team {
     id: string;
     name: string | undefined;
@@ -1730,11 +1939,18 @@ export interface PostTeamMemberRequestDto {
     isTemporary: boolean;
 }
 
+export interface PostTeamMembersRequestDto {
+    teamMembers: PostTeamMemberRequestDto[] | undefined;
+}
+
 export interface PutTeamMemberRequestDto {
-    id: string;
     userId: string | undefined;
     teamId: string | undefined;
     isTemporary: boolean;
+}
+
+export interface PutTeamMembersRequestDto {
+    teamMembers: PutTeamMemberRequestDto[] | undefined;
 }
 
 export interface UserDataResponseDto {

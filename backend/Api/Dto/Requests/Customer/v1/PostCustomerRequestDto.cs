@@ -7,7 +7,3 @@ public class PostCustomerRequestDto
     public string TeamId { get; set; }
     public string Address { get; set; }
 }
-
-
-
-

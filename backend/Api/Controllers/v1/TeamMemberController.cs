@@ -73,6 +73,7 @@ public class TeamMemberController : ControllerBase
     }
 
     [HttpPost]
+    [Route("AddTeamMember/")]
     public async Task<ActionResult<TeamMember>> PostTeamMemberAsync(PostTeamMemberRequestDto request)
     {
         try
@@ -85,8 +86,24 @@ public class TeamMemberController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+    
+    [HttpPost]
+    [Route("AddTeamMembers/")]
+    public async Task<ActionResult<IList<TeamMember>>> PostTeamMembersAsync(PostTeamMembersRequestDto request)
+    {
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PostTeamMembersRequestDto, AddTeamMembersCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
     [HttpPut]
+    [Route("UpdateTeamMember/")]
     public async Task<ActionResult<TeamMember>> PutTeamMemberAsync(PutTeamMemberRequestDto request)
     {
         try
@@ -99,4 +116,21 @@ public class TeamMemberController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPut]
+    [Route("UpdateTeamMembers/")]
+    public async Task<ActionResult<IList<TeamMember>>> PutTeamMembersAsync(PutTeamMembersRequestDto request)
+    {
+        try
+        {
+            var result = await _mediator.Send(_mapper.Map<PutTeamMembersRequestDto, UpdateTeamMembersCommand>(request));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    
 }

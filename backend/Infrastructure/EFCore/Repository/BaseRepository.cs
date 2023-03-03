@@ -53,4 +53,17 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         await _context.SaveChangesAsync();
         return entity;
     }
+
+    public async Task<IReadOnlyList<T>> UpdateRangeAsync(IEnumerable<T> entities)
+    {
+        _context.Set<T>().UpdateRange(entities);
+        await _context.SaveChangesAsync();
+        return entities.ToList();
+    }
+    public async Task<IReadOnlyList<T>> AddRangeAsync(IEnumerable<T> entities)
+    {
+        await _context.Set<T>().AddRangeAsync(entities);
+        await _context.SaveChangesAsync();
+        return entities.ToList();
+    }
 }
