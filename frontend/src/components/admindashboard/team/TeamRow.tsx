@@ -12,13 +12,13 @@ interface Props {
 const TeamRow = ({ team, teammembers, users }: Props) => {
   const [showModal, setShowModal] = useState(false);
   return (
-    <>
+    <tr>
       <td>{team.name}</td>
       <td>
         {teammembers
           ?.filter((x) => x.teamId === team.id)
           .map((teammember) => (
-            <div key={teammember.id} className='d-flex gap-2 mb-1 align-items-center'>
+            <div className='d-flex gap-2 mb-1 align-items-center' key={teammember.userId}>
               <div className='me-2'>
                 {users?.find((user) => teammember.userId === user.userId)?.displayName}
               </div>
@@ -47,7 +47,7 @@ const TeamRow = ({ team, teammembers, users }: Props) => {
           />
         )}
       </td>
-    </>
+    </tr>
   );
 };
 

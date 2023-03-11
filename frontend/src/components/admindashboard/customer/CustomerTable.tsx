@@ -30,15 +30,14 @@ const CustomerTable = ({ customers, teams, teammembers, customerchores, periodic
       </thead>
       <tbody>
         {customers?.map((customer, i) => (
-          <tr key={i}>
-            <CustomerRow
-              customer={customer}
-              teams={teams}
-              teammembers={teammembers}
-              customerchores={customerchores}
-              periodics={periodics}
-            />
-          </tr>
+          <CustomerRow
+            key={customer.id}
+            customer={customer}
+            teams={teams}
+            teammembers={teammembers}
+            customerchores={customerchores}
+            periodics={periodics}
+          />
         ))}
       </tbody>
     </Table>
