@@ -31,6 +31,15 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Areas");
@@ -44,6 +53,15 @@ namespace Infrastructure.EFCore.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -61,6 +79,15 @@ namespace Infrastructure.EFCore.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
 
                     b.Property<string>("SubCategoryId")
                         .HasColumnType("nvarchar(max)");
@@ -88,6 +115,15 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
 
@@ -111,6 +147,15 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("DoneBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -133,6 +178,15 @@ namespace Infrastructure.EFCore.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
 
                     b.Property<string>("TeamId")
                         .HasColumnType("nvarchar(max)");
@@ -160,6 +214,15 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("PeriodicId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("CustomerChores");
@@ -173,6 +236,15 @@ namespace Infrastructure.EFCore.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -191,6 +263,15 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -208,6 +289,15 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Teams");
@@ -221,11 +311,17 @@ namespace Infrastructure.EFCore.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsTemporary")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("RowCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RowModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RowVersion")
+                        .HasColumnType("int");
 
                     b.HasKey("TeamId", "UserId");
 

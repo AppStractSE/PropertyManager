@@ -21,14 +21,14 @@ import "./styling/overrides.scss";
 const App = () => {
   const client = new Client();
   const { currentUser, setCurrentUser } = useUser();
-  const [token, setToken] = useLocalStorage<TokenInfo>("token", InitialUserState.tokenInfo);
+  const [token, setToken] = useLocalStorage<TokenInfo>("token", InitialUserState.tokenInfo!);
+
   const { data: fetchedUser } = useQuery<AuthUser>(
     ["user", currentUser?.user?.userId],
     async () => {
-      console.log(currentUser);
-      return currentUser === InitialUserState && currentUser.tokenInfo?.token !== ""
+      return token.token !== InitialUserState.tokenInfo?.token
         ? await client.authenticate_GetValidation()
-        : new Promise(() => undefined);
+        : InitialUserState;
     },
     {
       onSuccess: (data) => {
@@ -45,9 +45,14 @@ const App = () => {
   );
 
   useEffect(() => {
+    if (token !== InitialUserState.tokenInfo) {
+      setCurrentUser({ ...currentUser, tokenInfo: token });
+    }
+  }, [token]);
+
+  useEffect(() => {
     if (currentUser !== InitialUserState) {
       if (currentUser.tokenInfo?.token !== "") {
-        console.log("SET TOKEN");
         setToken(currentUser.tokenInfo!);
       }
     }

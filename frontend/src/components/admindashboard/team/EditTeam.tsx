@@ -64,12 +64,11 @@ const EditTeam = ({ team, teammembers, users }: Props) => {
         <Form.Text as='div' className='mb-2 mt-0'>
           Temporära: {teamMembers.filter((x) => x.isTemporary).length}st
         </Form.Text>
-        <div className='d-flex flex-column gap-2'>
+        <div className='d-flex row'>
           {users.map((user) => (
-            <div className='d-flex gap-2 align-items-center'>
+            <div className='d-flex align-items-center col-6 gap-2 mt-1' key={user.userId}>
               <Form.Check
                 className='checkbox'
-                key={user.userId}
                 type='checkbox'
                 value={user.userId}
                 checked={teamMembers.some((tm) => tm.userId === user.userId)}
@@ -95,6 +94,7 @@ const EditTeam = ({ team, teammembers, users }: Props) => {
                   .filter((tm) => tm.userId === user.userId)
                   .map((tm) => (
                     <Badge
+                      key={tm.userId}
                       style={{ cursor: "pointer", userSelect: "none" }}
                       pill
                       text={tm.isTemporary ? "dark" : undefined}
@@ -119,7 +119,6 @@ const EditTeam = ({ team, teammembers, users }: Props) => {
         </div>
       </Form.Group>
       <Button
-        className='w-50'
         onClick={() => {
           updateTeam();
         }}

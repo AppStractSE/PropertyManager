@@ -62,7 +62,7 @@ const EditCustomer = ({
           <Form.Label>Team</Form.Label>
           <Form.Select value={team} className='rounded-0' onChange={(e) => setTeam(e.target.value)}>
             {teams?.map((team) => (
-              <option value={team.id}>{team.name}</option>
+              <option key={team.id} value={team.id}>{team.name}</option>
             ))}
           </Form.Select>
         </Form.Group>
@@ -78,11 +78,7 @@ const EditCustomer = ({
       </Form.Group>
 
       <div className='d-flex gap-4'>
-        <Button className='w-50' onClick={() => onHide()}>
-          Avbryt
-        </Button>
-        <Button
-          className='w-50'
+        <Button className="w-100"
           onClick={() => updateCustomer()}
           disabled={
             updatingCustomer ||

@@ -2,7 +2,7 @@ using Core.Repository.Interfaces;
 using DotCode.SecurityUtils;
 using Infrastructure.Context;
 using Infrastructure.EFCore.Context;
-using Infrastructure.Redis;
+using Infrastructure.Cache;
 using Infrastructure.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ public static class Infrastructure
         builder.Services.AddScoped<IChoreStatusRepository, ChoreStatusRepository>();
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
         builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
-        builder.Services.AddScoped<IRedisCache, RedisCache>();
+        builder.Services.AddSingleton<ICache, InMemoryCache>();
 
         builder.Services.InitDatabase(builder.Configuration, builder.Environment.EnvironmentName == "Development");
         builder.Services.ConfigureRedisConnection(builder.Configuration, key);
@@ -37,7 +37,7 @@ public static class Infrastructure
 
     private static void InitDatabase(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
     {
-        var encryptedConnectionString = configuration.GetConnectionString("devDBconnection");
+        var encryptedConnectionString = configuration.GetConnectionString("databaseConnection");
         var decryptedConnectionString = Cipher.DecryptString(encryptedConnectionString!, key);
 
         services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(decryptedConnectionString));
@@ -46,13 +46,5 @@ public static class Infrastructure
         var useInMemoryDatabase = configuration["ForceUseInMemoryDatabase"] != null ?
                    bool.Parse(configuration["ForceUseInMemoryDatabase"]!) :
                    configuration.GetConnectionString("databaseConnection") == null;
-
-        //if (useInMemoryDatabase)
-        //{
-        //    services.AddDbContext<PropertyManagerContext>(c => c.UseInMemoryDatabase("Database"));
-        //}
-        //else
-        //{
-        //}
     }
 }

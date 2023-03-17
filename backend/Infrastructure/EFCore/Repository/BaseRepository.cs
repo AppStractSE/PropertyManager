@@ -8,10 +8,13 @@ namespace Infrastructure.Repository;
 public class BaseRepository<T> : IRepository<T> where T : BaseEntity
 {
     public DbContext _context;
+
     public BaseRepository(DbContext context)
     {
         _context = context;
+        _context.SavingChanges += Context_SavingChanges;
     }
+
     public async Task<IReadOnlyList<T>> GetAllAsync(bool disableTracking = true, string includes = null)
     {
         IQueryable<T> source = _context.Set<T>();
@@ -49,13 +52,19 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
 
     public async Task<T> UpdateAsync(T entity)
     {
+        await AddRowData(entity);
         _context.Set<T>().Update(entity);
         await _context.SaveChangesAsync();
         return entity;
     }
 
-    public async Task<IReadOnlyList<T>> UpdateRangeAsync(IEnumerable<T> entities)
+
+    public async virtual Task<IReadOnlyList<T>> UpdateRangeAsync(IEnumerable<T> entities)
     {
+        foreach (var entity in entities)
+        {
+            await AddRowData(entity);
+        }
         _context.Set<T>().UpdateRange(entities);
         await _context.SaveChangesAsync();
         return entities.ToList();
@@ -65,5 +74,53 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity
         await _context.Set<T>().AddRangeAsync(entities);
         await _context.SaveChangesAsync();
         return entities.ToList();
+    }
+
+    public async Task<bool> DeleteAsync(T entity)
+    {
+        _context.Set<T>().Remove(entity);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> DeleteRangeAsync(IEnumerable<T> entities)
+    {
+        _context.Set<T>().RemoveRange(entities);
+        return await _context.SaveChangesAsync() > 0;
+    }
+
+    private void Context_SavingChanges(object sender, SavingChangesEventArgs args)
+    {
+        var entities = _context.ChangeTracker.Entries()
+            .Where(x => x.Entity is BaseEntity && x.Entity is T &&
+            (x.State == EntityState.Added || x.State == EntityState.Modified))
+            .ToArray();
+
+        foreach (var entity in entities)
+        {
+            var baseEntity = entity.Entity as BaseEntity;
+
+            if (entity.State == EntityState.Added)
+            {
+                baseEntity.RowCreated = DateTime.Now;
+            }
+
+            baseEntity.RowModified = DateTime.Now;
+            baseEntity.RowVersion += 1;
+        }
+    }
+    private async Task AddRowData(T entity)
+    {
+        var idProperty = entity.GetType().GetProperty("Id").GetValue(entity, null);
+        var oldEntity = await _context.Set<T>().FindAsync(idProperty);
+        _context.ChangeTracker.Clear();
+
+        SetRowData(entity, oldEntity);
+    }
+
+    private protected void SetRowData(T entity, T oldEntity)
+    {
+        entity.RowCreated = oldEntity.RowCreated;
+        entity.RowModified = oldEntity.RowModified;
+        entity.RowVersion = oldEntity.RowVersion;
     }
 }

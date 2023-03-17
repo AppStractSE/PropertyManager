@@ -25,7 +25,7 @@ public class TeamMemberController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IList<TeamMember>>> GetAllTeamMembers()
+    public async Task<ActionResult<IList<TeamMemberResponseDto>>> GetAllTeamMembers()
     {
         try
         {
@@ -35,22 +35,6 @@ public class TeamMemberController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(message: "Error in TeamMember controller: GetAllTeamMembers");
-            return BadRequest(ex.Message);
-        }
-    }
-
-    [HttpGet]
-    [Route("GetTeamMemberById/")]
-    public async Task<ActionResult<TeamMemberResponseDto>> GetTeamMemberById([FromQuery] GetTeamMemberByIdRequestDto request)
-    {
-        try
-        {
-            var result = await _mediator.Send(_mapper.Map<GetTeamMemberByIdRequestDto, GetTeamMemberByIdQuery>(request));
-            return result != null ? Ok(_mapper.Map<TeamMemberResponseDto>(result)) : NoContent();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(message: "Error in TeamMember controller: GetTeamMemberById");
             return BadRequest(ex.Message);
         }
     }
@@ -86,7 +70,7 @@ public class TeamMemberController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     [HttpPost]
     [Route("AddTeamMembers/")]
     public async Task<ActionResult<IList<TeamMember>>> PostTeamMembersAsync(PostTeamMembersRequestDto request)
@@ -132,5 +116,5 @@ public class TeamMemberController : ControllerBase
         }
     }
 
-    
+
 }
