@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Button, Form, Spinner } from "react-bootstrap";
 import { useMutation, useQueryClient } from "react-query";
-import { AreaResponseDto, TeamResponseDto } from "../../../api/client";
-import { useClient } from "../../../contexts/ClientContext";
+import { AreaResponseDto, TeamResponseDto } from "../../../../api/client";
+import { useClient } from "../../../../contexts/ClientContext";
 
 interface Props {
   teams: TeamResponseDto[];
   areas: AreaResponseDto[];
+  close?: () => void;
 }
 
-const AddCustomer = ({ teams, areas }: Props) => {
+const AddCustomer = ({ teams, areas, close }: Props) => {
   const [teamValue, setTeamValue] = useState("");
   const [areaValue, setAreaValue] = useState("");
   const [customerValue, setCustomerValue] = useState("");
@@ -33,21 +34,31 @@ const AddCustomer = ({ teams, areas }: Props) => {
         setAddressValue("");
         queryClient.invalidateQueries("customers");
         console.log("Customer posted");
+        if (close) close();
       },
     },
   );
   return (
     <Form>
+      <Form.Group className='mb-3'>
+        <Form.Label>Namn</Form.Label>
+        <Form.Control
+          type='text'
+          placeholder='Skriv in kundnamn'
+          value={customerValue}
+          onChange={(e) => setCustomerValue(e.target.value)}
+        />
+      </Form.Group>
+      <Form.Group className='mb-3'>
+        <Form.Label>Adress</Form.Label>
+        <Form.Control
+          type='text'
+          placeholder='Skriv in kundadress'
+          value={addressValue}
+          onChange={(e) => setAddressValue(e.target.value)}
+        />
+      </Form.Group>
       <Form.Group className='row'>
-        <Form.Group className='mb-3 col-6'>
-          <Form.Label>Namn</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Skriv in kundnamn'
-            value={customerValue}
-            onChange={(e) => setCustomerValue(e.target.value)}
-          />
-        </Form.Group>
         <Form.Group className='mb-3 col-6'>
           <Form.Label>Team</Form.Label>
           <Form.Select
@@ -65,17 +76,6 @@ const AddCustomer = ({ teams, areas }: Props) => {
                 );
               })}
           </Form.Select>
-        </Form.Group>
-      </Form.Group>
-      <Form.Group className='row'>
-        <Form.Group className='mb-3 col-6'>
-          <Form.Label>Address</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Skriv in kundaddress'
-            value={addressValue}
-            onChange={(e) => setAddressValue(e.target.value)}
-          />
         </Form.Group>
         <Form.Group className='mb-3 col-6'>
           <Form.Label>Område</Form.Label>

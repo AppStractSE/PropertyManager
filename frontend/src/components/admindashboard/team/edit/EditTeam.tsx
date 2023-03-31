@@ -6,8 +6,8 @@ import {
   TeamMemberResponseDto,
   TeamResponseDto,
   UserInfoDto,
-} from "../../../api/client";
-import { useClient } from "../../../contexts/ClientContext";
+} from "../../../../api/client";
+import { useClient } from "../../../../contexts/ClientContext";
 
 interface Props {
   team: TeamResponseDto;
@@ -32,13 +32,20 @@ const EditTeam = ({ team, teammembers, users }: Props) => {
       },
     },
   );
-  const { mutate: updateTeamMembers, isLoading: updatingTeamMembers } = useMutation(async () => {
-    return await client.teamMember_PutTeamMembers({
-      teamMembers: teamMembers.map((tm) => {
-        return { ...tm, teamId: team.id };
-      }),
-    });
-  });
+  const { mutate: updateTeamMembers, isLoading: updatingTeamMembers } = useMutation(
+    async () => {
+      return await client.teamMember_PutTeamMembers({
+        teamMembers: teamMembers.map((tm) => {
+          return { ...tm, teamId: team.id };
+        }),
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("teamMembers");
+      },
+    },
+  );
 
   const teamObject = {
     id: team.id,

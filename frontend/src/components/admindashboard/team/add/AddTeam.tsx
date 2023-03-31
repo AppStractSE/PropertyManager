@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useMutation, useQueryClient } from "react-query";
-import { PostTeamMemberRequestDto, TeamMemberResponseDto, UserInfoDto } from "../../../api/client";
-import { useClient } from "../../../contexts/ClientContext";
+import {
+  PostTeamMemberRequestDto,
+  TeamMemberResponseDto,
+  UserInfoDto,
+} from "../../../../api/client";
+import { useClient } from "../../../../contexts/ClientContext";
 
 interface Props {
   users: UserInfoDto[];
@@ -55,10 +59,10 @@ const AddTeam = ({ users, teammembers, close }: Props) => {
   return (
     <Form>
       <Form.Group className='mb-3' controlId='formAddTeam'>
-        <Form.Label>Teamnamn</Form.Label>
+        <Form.Label>Namn</Form.Label>
         <Form.Control
           type='text'
-          placeholder='Fyll i teamnamn'
+          placeholder='Skriv in teamnamn'
           value={teamValue}
           onChange={(e) => setTeamValue(e.target.value)}
         />

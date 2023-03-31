@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import {
+  AreaResponseDto,
   ChoreResponseDto,
   CustomerChoreResponseDto,
   CustomerResponseDto,
   Periodic,
   TeamMemberResponseDto,
   TeamResponseDto,
-} from "../../../api/client";
-import { useClient } from "../../../contexts/ClientContext";
-import EditCustomerModal from "../modals/EditCustomerModal";
+} from "../../../../api/client";
+import EditCustomerModal from "../edit/EditCustomerModal";
 
 interface Props {
   customer: CustomerResponseDto;
@@ -19,6 +18,7 @@ interface Props {
   customerchores: CustomerChoreResponseDto[];
   periodics: Periodic[];
   chores: ChoreResponseDto[];
+  areas: AreaResponseDto[];
 }
 
 const CustomerRow = ({
@@ -28,41 +28,48 @@ const CustomerRow = ({
   customerchores,
   periodics,
   chores,
+  areas,
 }: Props) => {
-  const [showModal, setShowModal] = useState(false);
-  const client = useClient();
+  const [customerModal, setShowCustomerModal] = useState(false);
   return (
     <tr>
       <td>{customer.name}</td>
-      <td>{customer.address}</td>
-      <td>{teams.filter((team) => team.id === customer.teamId).map((team) => team.name)}</td>
       <td>
-        {customerchores.filter((customerchore) => customerchore.customerId === customer.id).length}
+        {customerchores.filter((x) => x.status === "Klar" && x.customerId === customer.id).length}
       </td>
+      <td>
+        {
+          customerchores.filter((x) => x.status === "Påbörjad" && x.customerId === customer.id)
+            .length
+        }
+      </td>
+      <td>
+        {
+          customerchores.filter((x) => x.status === "Ej påbörjad" && x.customerId === customer.id)
+            .length
+        }
+      </td>
+      <td>{teams.filter((team) => team.id === customer.teamId).map((team) => team.name)}</td>
+
       <td>
         <Button
           className='me-2'
           variant='outline-primary'
           size='sm'
-          onClick={() => setShowModal(!showModal)}
+          onClick={() => setShowCustomerModal(!customerModal)}
         >
           Visa mer
         </Button>
-        <Link to={`/customer/${customer.id}`} className='router-link'>
-          <Button variant='outline-primary' size='sm'>
-            Gå till
-          </Button>
-        </Link>
       </td>
       <EditCustomerModal
-        show={showModal}
-        onHide={() => setShowModal(false)}
+        chores={chores}
         customer={customer}
+        customerchores={customerchores}
+        onHide={() => setShowCustomerModal(!customerModal)}
+        periodics={periodics}
+        show={customerModal}
         teams={teams}
         teammembers={teammembers}
-        customerchores={customerchores}
-        periodics={periodics}
-        chores={chores}
       />
     </tr>
   );
