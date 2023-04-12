@@ -1,13 +1,15 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import { AuthUser, TokenInfo } from "./api/client";
+import AppBar from "./components/AppBar";
+import CustomerChoreInfo from "./components/CustomerChoreInfo";
 import { useClient } from "./contexts/ClientContext";
+import { useTheme } from "./contexts/ThemeContext";
 import { InitialUserState, useUser } from "./contexts/UserContext";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import Layout from "./Layout";
 import AdminDashboard from "./pages/AdminDashboard";
 import Customer from "./pages/Customer";
 import Home from "./pages/Home";
@@ -19,6 +21,7 @@ import "./styling/overrides.scss";
 const App = () => {
   const client = useClient();
   const { currentUser, setCurrentUser } = useUser();
+  const { isDarkTheme } = useTheme();
   const [token, setToken] = useLocalStorage<TokenInfo>("token", InitialUserState.tokenInfo!);
 
   const { data: fetchedUser } = useQuery<AuthUser>(
@@ -38,7 +41,6 @@ const App = () => {
       onError: (error) => {
         console.log(error);
       },
-      refetchOnWindowFocus: false,
     },
   );
 
@@ -56,26 +58,46 @@ const App = () => {
     }
   }, [currentUser]);
 
-  console.log(currentUser.user?.role);
   return (
-    <AnimatePresence mode='wait'>
+    <>
       <Routes>
-        <Route path='/' element={<Layout />}>
-          {currentUser === InitialUserState ? (
-            <Route index element={<Login />} />
-          ) : (
-            <>
-              <Route
-                index
-                element={currentUser.user?.role !== "Admin" ? <Home /> : <AdminDashboard />}
-              />
-              <Route path='customer/:id' element={<Customer />} />
-            </>
-          )}
-          <Route path='*' element={<NotFound />} />
-        </Route>
+        {currentUser === InitialUserState ? (
+          <Route index element={<Login />} />
+        ) : (
+          <>
+            <Route
+              index
+              element={
+                currentUser.user?.role === "Admin" ? (
+                  <>
+                    <AppBar />
+                    <AdminDashboard />
+                  </>
+                ) : (
+                  <Home />
+                )
+              }
+            />
+            <Route path='customer/:id' element={<Customer />} />
+            <Route path='customer/:id/chore/:customerChoreId' element={<CustomerChoreInfo />} />
+          </>
+        )}
+        <Route path='*' element={<NotFound />} />
       </Routes>
-    </AnimatePresence>
+      {/* Default toast */}
+      <ToastContainer
+        position={window.innerWidth > 768 ? "top-right" : "top-center"}
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={isDarkTheme ? "dark" : "light"}
+      />
+    </>
   );
 };
 
