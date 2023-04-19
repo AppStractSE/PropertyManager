@@ -444,6 +444,93 @@ export class Client extends BaseClient {
         return Promise.resolve<void>(null as any);
     }
 
+    blob_UploadBlob(customerChoreId: string | null | undefined, fileExtension: string | null | undefined, formFile: FileParameter | null | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/v1/Blob";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (customerChoreId !== null && customerChoreId !== undefined)
+            content_.append("CustomerChoreId", customerChoreId.toString());
+        if (fileExtension !== null && fileExtension !== undefined)
+            content_.append("FileExtension", fileExtension.toString());
+        if (formFile !== null && formFile !== undefined)
+            content_.append("FormFile", formFile.data, formFile.fileName ? formFile.fileName : "FormFile");
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processBlob_UploadBlob(_response);
+        });
+    }
+
+    protected processBlob_UploadBlob(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    blob_ListBlobs(containerName: string | null): Promise<string[]> {
+        let url_ = this.baseUrl + "/{containerName}";
+        if (containerName === undefined || containerName === null)
+            throw new Error("The parameter 'containerName' must be defined.");
+        url_ = url_.replace("{containerName}", encodeURIComponent("" + containerName));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processBlob_ListBlobs(_response);
+        });
+    }
+
+    protected processBlob_ListBlobs(response: Response): Promise<string[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as string[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<string[]>(null as any);
+    }
+
     category_GetAllCategories(): Promise<CategoryResponseDto[]> {
         let url_ = this.baseUrl + "/api/v1/Category";
         url_ = url_.replace(/[?&]$/, "");
@@ -897,11 +984,9 @@ export class Client extends BaseClient {
         return Promise.resolve<ChoreStatus>(null as any);
     }
 
-    choreStatus_GetChoreStatusById(id: string | undefined): Promise<ChoreStatusResponseDto[]> {
+    choreStatus_GetChoreStatusById(id: string | null | undefined): Promise<ChoreStatusResponseDto[]> {
         let url_ = this.baseUrl + "/api/v1/ChoreStatus/GetChoreStatusById?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
+        if (id !== undefined && id !== null)
             url_ += "Id=" + encodeURIComponent("" + id) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2005,13 +2090,13 @@ export interface ChoreStatusResponseDto {
 export interface ChoreStatus {
     id: string;
     customerChoreId: string | undefined;
-    startDate: Date;
     completedDate: Date;
     doneBy: string | undefined;
 }
 
 export interface PostChoreStatusRequestDto {
     customerChoreId: string | undefined;
+    completedDate: Date | undefined;
     doneBy: string | undefined;
 }
 
@@ -2024,7 +2109,7 @@ export interface CustomerChore {
     frequency: number;
     progress: number;
     status: string | undefined;
-    reset: string | undefined;
+    daysUntilReset: number;
     periodicId: string | undefined;
     periodic: Periodic | undefined;
 }
@@ -2049,6 +2134,7 @@ export interface CustomerChoreResponseDto {
     choreId: string | undefined;
     frequency: number;
     periodicId: string | undefined;
+    daysUntilReset: number;
     progress: number;
     status: string | undefined;
     periodic: Periodic | undefined;
@@ -2173,6 +2259,12 @@ export interface UserCustomerChoreData {
     progress: number;
     subCategoryName: string | undefined;
     periodic: Periodic | undefined;
+    daysUntilReset: number;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export interface FileResponse {

@@ -19,8 +19,8 @@ public class SeedDb
         if (!context.SubCategories.Any()) await GenerateSubCategories(context);
         if (!context.Chores.Any()) await GenerateChores(context);
         if (!context.CustomerChores.Any()) await GenerateCustomerChores(context);
-        if (!context.ChoreComments.Any()) await GenerateChoreComments(context);
-        if (!context.ChoreStatuses.Any()) await GenerateChoreStatuses(context);
+        // if (!context.ChoreComments.Any()) await GenerateChoreComments(context);
+        // if (!context.ChoreStatuses.Any()) await GenerateChoreStatuses(context);
     }
 
     private static async Task GenerateSubCategories(PropertyManagerContext context)
@@ -209,7 +209,6 @@ public class SeedDb
             new ChoreStatus
             {
                 CustomerChoreId = _context.CustomerChores.FirstOrDefault(x => x.ChoreId == _context.Chores.First(x => x.Title == "Beskärning buskar").Id.ToString()).Id.ToString(),
-                StartDate = DateTime.Today,
                 CompletedDate = DateTime.Today,
                 DoneBy = "UserId",
             });
