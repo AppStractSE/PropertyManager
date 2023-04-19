@@ -1,5 +1,10 @@
-# PropertyManager
+# OBSOLETE PROJECT
 
+**This project has been split up into separate frontend and backend repositories. This repository will no longer be actively maintained or developed.**
 
-OBSOLITE PROJECT - This project has been split up into frontend and backend repositories. This repository will not be worked on.
-Please check PropertyManager-Frontend and PropertyManager-Backend
+Please check out the new repositories:
+
+- [PropertyManager-Frontend](https://github.com/AppStractSE/PropertyManager-Frontend)
+- [PropertyManager-Backend](https://github.com/AppStractSE/PropertyManager-Backend)
+
+Thank you for your interest in our project!
